@@ -1,9 +1,11 @@
 /*
  * timezone - get and display timezone related information
- * (c) 2003-2004 Michael Wardle
+ * (c) 2003-2009 Mikel Ward
  */
 
+#include <cstdio>
 #include <cstdlib>
+#include <iostream>
 
 #include "timezone.h"           // Prototypes for nextdst(), printoff()
 
@@ -19,11 +21,20 @@ int main(int argc, char *argv[])
     clock = time(0);            // Determine current system time
     printoff(clock);            // Print current DST offset
 
-    for (i = 0; i < 2; i++)     // Find and print the next two DST transitions
+    if (dsttype())
     {
-        clock = nextdst(clock);
-        printoff(clock);
+        for (i = 0; i < 2; i++)     // Find and print the next two DST transitions
+        {
+            clock = nextdst(clock);
+            printoff(clock);
+        }
     }
-    
+    else
+    {
+        std::cout << "Timezone does not have daylight savings" << std::endl;
+    }
+
     exit(EXIT_SUCCESS);
 }
+
+// vi: set sw=4 et:

@@ -1,6 +1,6 @@
 /*
  * timezone - timezone information functions
- * (c) 2003-2004 Michael Wardle
+ * (c) 2003-2009 Mikel Ward
  */
 
 #include <cstdio>
@@ -59,7 +59,7 @@ long dstoffset(time_t clock)
         perror("Unable to allocate memory");
         return 0;
     }
- 
+
     tzset();                    // Ensure timezone is set
     tm = localtime(&clock);     // Create local calendar time
     if (!tm)
@@ -74,6 +74,11 @@ long dstoffset(time_t clock)
     lclock = clock - timezone;  // Determine local standard system time
                                 // (UTC plus standard time zone offset)
     tm = gmtime(&lclock);       // Create local calendar time with no time zone
+    if (!tm)
+    {
+        perror("Unable to convert system time to calendar time");
+        return 0;
+    }
     //tm->tm_isdst = daylight;  // Reinstate DST
     tm->tm_isdst = isdst;       // Reinstate DST if it applied at clock
     clock = mktime(tm);         // Convert local time back to UTC system time
@@ -137,13 +142,6 @@ int isdst(time_t clock)
     struct tm *tm;              // Temporary calendar time
     int dst;                    // Whether daylight savings applies at clock
 
-    tm = (struct tm *)malloc(sizeof(struct tm));
-    if (!tm)
-    {
-        perror("Unable to allocate memory");
-        return -1;
-    }
-
     tm = localtime(&clock);     // Determine local calendar time for clock
     dst = tm->tm_isdst;         // Store daylight savings time status at clock
     return dst;
@@ -176,12 +174,18 @@ time_t nextdst()
 time_t nextdst(time_t clock)
 {
     int dst;                    // Whether daylight savings applies at clock
+    int stepsize = 600;         // Try each 10-minute interval
 
+    if (dsttype() == 0)
+    {
+        std::cerr << "Daylight savings not in effect" << std::endl;
+        return -1;
+    }
     dst = isdst(clock);         // Determine current DST status
-    clock -= (clock % 60);      // Round time down to nearest minute
+    clock -= (clock % 600);     // Round down to nearest ten minutes
     while (isdst(clock) == dst) // Find the next time where DST is different
     {
-        clock += 60;            // Skip 1 minute
+        clock += stepsize;      // Try stepsize minutes later
     }
     return clock;
 }
@@ -218,7 +222,7 @@ void printoff(time_t clock)
 
     if (clock < 0)
     {
-        perror("Invalid system time");
+        fprintf(stderr, "Invalid system time\n");
         return;
     }
     offset = utcoffset(clock);
@@ -297,3 +301,5 @@ long utcoffset(time_t clock)
 #endif // _BSD_SOURCE || _GNU_SOURCE
     return offset;
 }
+
+// vi: set sw=4 et:
