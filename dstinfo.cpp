@@ -1,6 +1,6 @@
 /*
- * timezone - get and display timezone related information
- * (c) 2003-2009 Mikel Ward
+ * dstinfo - print information about upcoming daylight savings transitions
+ * (c) 2003-2014 Mikel Ward
  */
 
 #include <cstdio>
@@ -9,31 +9,25 @@
 
 #include "timezone.h"           // Prototypes for nextdst(), printoff()
 
+#define NUM_TRANSITIONS 2      // Number of DST transitions to print
+
 /**
- * Prints information about the local time zone's relationship to the universal
- * time zone.
+ * Prints information about upcoming daylight savings transitions.
  */
 int main(int argc, char *argv[])
 {
-    time_t clock;               // Temporary system time variable
-    int i;                      // Loop counter
+    time_t t = time(0);
+    printoff(t);
 
-    clock = time(0);            // Determine current system time
-    printoff(clock);            // Print current DST offset
-
-    if (dsttype())
-    {
-        for (i = 0; i < 2; i++)     // Find and print the next two DST transitions
-        {
-            clock = nextdst(clock);
-            printoff(clock);
-        }
-    }
-    else
-    {
+    if (!dsttype()) {
         std::cout << "Timezone does not have daylight savings" << std::endl;
+        exit(EXIT_SUCCESS);
     }
 
+    for (int i = 0; i < NUM_TRANSITIONS; i++) {
+        t = nextdst(t);
+        printoff(t);
+    }
     exit(EXIT_SUCCESS);
 }
 

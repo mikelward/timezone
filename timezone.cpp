@@ -272,6 +272,7 @@ long utcoffset()
 long utcoffset(time_t clock)
 {
     int isdst;                  // Whether daylight savings applies at clock
+    time_t lclock;              // Local system time
     long offset;                // Seconds East of UTC in local time zone
     struct tm *tm;              // Temporary calendar time variable
 
