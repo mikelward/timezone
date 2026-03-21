@@ -136,6 +136,11 @@ int isdst(time_t clock)
     int dst;                    // Whether daylight savings applies at clock
 
     tm = localtime(&clock);     // Determine local calendar time for clock
+    if (!tm)
+    {
+        perror("Unable to convert system time to calendar time");
+        return -1;
+    }
     dst = tm->tm_isdst;         // Store daylight savings time status at clock
     return dst;
 }
