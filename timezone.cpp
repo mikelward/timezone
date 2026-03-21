@@ -53,13 +53,6 @@ long dstoffset(time_t clock)
         return 0;
     }
 
-    tm = (struct tm *)malloc(sizeof(struct tm));
-    if (!tm)
-    {
-        perror("Unable to allocate memory");
-        return 0;
-    }
-
     tzset();                    // Ensure timezone is set
     tm = localtime(&clock);     // Create local calendar time
     if (!tm)
