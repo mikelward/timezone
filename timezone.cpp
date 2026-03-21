@@ -269,13 +269,6 @@ long utcoffset(time_t clock)
     long offset;                // Seconds East of UTC in local time zone
     struct tm *tm;              // Temporary calendar time variable
 
-    tm = (struct tm *)malloc(sizeof(struct tm));
-    if (!tm)
-    {
-        perror("Unable to allocate memory");
-        return -1;
-    }
-
     tzset();                    // Ensure timezone is set
     tm = localtime(&clock);     // Get current calendar time
     if (!tm)
