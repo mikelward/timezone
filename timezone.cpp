@@ -193,7 +193,7 @@ void printoff()
     time_t now;
 
     now = time(0);
-    if (time < 0)
+    if (now < 0)
     {
         perror("Unable to determine system time");
         return;
