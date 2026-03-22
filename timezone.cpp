@@ -53,13 +53,6 @@ long dstoffset(time_t clock)
         return 0;
     }
 
-    tm = (struct tm *)malloc(sizeof(struct tm));
-    if (!tm)
-    {
-        perror("Unable to allocate memory");
-        return 0;
-    }
-
     tzset();                    // Ensure timezone is set
     tm = localtime(&clock);     // Create local calendar time
     if (!tm)
@@ -143,6 +136,11 @@ int isdst(time_t clock)
     int dst;                    // Whether daylight savings applies at clock
 
     tm = localtime(&clock);     // Determine local calendar time for clock
+    if (!tm)
+    {
+        perror("Unable to convert system time to calendar time");
+        return -1;
+    }
     dst = tm->tm_isdst;         // Store daylight savings time status at clock
     return dst;
 }
@@ -200,7 +198,7 @@ void printoff()
     time_t now;
 
     now = time(0);
-    if (time < 0)
+    if (now < 0)
     {
         perror("Unable to determine system time");
         return;
@@ -275,13 +273,6 @@ long utcoffset(time_t clock)
     time_t lclock;              // Local system time
     long offset;                // Seconds East of UTC in local time zone
     struct tm *tm;              // Temporary calendar time variable
-
-    tm = (struct tm *)malloc(sizeof(struct tm));
-    if (!tm)
-    {
-        perror("Unable to allocate memory");
-        return -1;
-    }
 
     tzset();                    // Ensure timezone is set
     tm = localtime(&clock);     // Get current calendar time

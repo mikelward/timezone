@@ -3,6 +3,9 @@
  * (c) 2003-2004 Michael Wardle
  */
 
+#ifndef TIMEZONE_H
+#define TIMEZONE_H
+
 #include <time.h>
 
 int dsttype();
@@ -21,3 +24,5 @@ void printoff(time_t clock);
 
 long utcoffset();
 long utcoffset(time_t clock);
+
+#endif // TIMEZONE_H
